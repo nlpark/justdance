@@ -65,13 +65,17 @@ def findPose():
         opWrapper.configure(params)
         opWrapper.start()
 
-        # Process Image
+        # Process Video
         datum = op.Datum()
         capture  = cv2.VideoCapture(args[0].video)
         fps = capture.get(cv2.CAP_PROP_FPS)
+        
+        frames = []
+
         print('fps: ', fps)
         i = 0
         count = 0
+
         while(capture.isOpened()):
             ret, frame = capture.read()
             if ret == False:
@@ -79,16 +83,21 @@ def findPose():
             datum.cvInputData = frame
             opWrapper.emplaceAndPop([datum])
 
-            print("Frame #", i)
-            print("Body keypoints: \n" + str(datum.poseKeypoints))
-            print("------------------------------------------------------------------------------------------------")
+            keypoints = datum.poseKeypoints
+            frame = buildFrame25(keypoints, i)
+            frames.append(frame)
 
+            # print("Body keypoints: \n" + str(keypoints))
+            
             cv2.imshow('video'+str(i)+'.jpg', datum.cvOutputData)
-            cv2.waitKey(60)
+            cv2.waitKey(20)
             # cv2.imwrite('video'+str(i)+'.jpg',frame)
             i+=1
             count+=int(fps)
             capture.set(1, count)
+
+            if count >= 100:
+                break
     
         capture.release()
 
@@ -96,6 +105,45 @@ def findPose():
         print(e)
         sys.exit(-1)
 
+
+def buildFrame25(keypoints, i):
+    if len(keypoints) != 2:
+        raise ValueError("keypoint array is wrong length.... length = ", len(keypoints))
+
+    print("Frame #", i)
+    frame = dict()
+
+    for i in range(1, 3):
+        frame['Nose-' + str(i)] = keypoints[i-1][0]
+        frame['Neck-'  + str(i)] = keypoints[i-1][1]
+        frame['RShoulder-' + str(i)] = keypoints[i-1][2]
+        frame['RElbow-' + str(i)] = keypoints[i-1][3]
+        frame['RWrist-' + str(i)] = keypoints[i-1][4]
+        frame['LShoulder-' + str(i)] = keypoints[i-1][5]
+        frame['LElbow-' + str(i)] = keypoints[i-1][6]
+        frame['LWrist-' + str(i)] = keypoints[i-1][7]
+        frame['MidHip-' + str(i)] = keypoints[i-1][8]
+        frame['RHip-' + str(i)] = keypoints[i-1][9]
+        frame['RKnee-' + str(i)] = keypoints[i-1][10]
+        frame['RAnkle-' + str(i)] = keypoints[i-1][11]
+        frame['LHip-' + str(i)] = keypoints[i-1][12]
+        frame['LKnee-' + str(i)] = keypoints[i-1][13]
+        frame['LAnkle-' + str(i)] = keypoints[i-1][14]
+        frame['REye-' + str(i)] = keypoints[i-1][15]
+        frame['LEye-' + str(i)] = keypoints[i-1][16]
+        frame['REar-' + str(i)] = keypoints[i-1][17]
+        frame['LEar-' + str(i)] = keypoints[i-1][18]
+        frame['LBigToe-' + str(i)] = keypoints[i-1][19]
+        frame['LSmallToe-' + str(i)] = keypoints[i-1][20]
+        frame['LHeel-' + str(i)] = keypoints[i-1][21]
+        frame['RBigToe-' + str(i)] = keypoints[i-1][22]
+        frame['RSmallToe-' + str(i)] = keypoints[i-1][23]
+        frame['RHeel-' + str(i)] = keypoints[i-1][24]
+
+    # print(frame)
+    # print("------------------------------------------------------------------------------------------------")
+
+    return frame
 
 if __name__ == "__main__":
     findPose()
