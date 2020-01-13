@@ -4,12 +4,11 @@ import os
 from sys import platform
 import argparse
 import math
-from scipy.spatial.distance import euclidean
 
 from findPose import findPose
 from savedFrames import savedFrames
 
-def comparePoseRecenterScale(frames, threshold, scale):
+def comparePoseRecenterScale(frames, threshold, doScale):
     c = 0
     score = 0
     for f in frames:
@@ -21,7 +20,7 @@ def comparePoseRecenterScale(frames, threshold, scale):
         personTwo = recenter(f[1])
 
         # if we want to scale from height, do that
-        if (scale == 1):
+        if doScale == 1:
             personTwo = scale(personOne, personTwo)
 
         # compare points, calculate score
@@ -36,7 +35,7 @@ def comparePoseRecenterScale(frames, threshold, scale):
             coordX2 = coord2[0]
             coordY2 = coord2[1]
 
-            dist = math.sqrt((coordX1 - coordX2)**2 + (coordY1 - coordY2)**2) 
+            dist = euclidean(coordX1, coordY1, coordX2, coordY2) 
             dists.append(dist)
             c+=1
             if dist <= threshold :
@@ -50,7 +49,7 @@ def recenter(person):
     center = person['Neck']
     cX = center[0]
     cY = center[1]
-    newPerson = person
+    newPerson = dict()
 
     for key in person:
         coord = person[key]
@@ -68,18 +67,52 @@ def recenter(person):
 def scale(person1, person2):
     # since it's already zeroed to the neck, we can judge height from neck
     # to heel
+    newPerson = dict()
+
     rheel1 = person1['RHeel']
     lheel1 = person1['LHeel']
     rheel2 = person2['RHeel']
     lheel2 = person2['LHeel']
-    
-    x1 = ( rheel1[0] + lheel1[0] ) / 2
-    y1 = ( rheel1[1] + lheel1[1] ) / 2
-    x2 = ( rheel2[0] + lheel2[0] ) / 2
-    y2 = ( rheel2[1] + lheel2[1] ) / 2
 
-    # in case one leg is bent and the other isnt, take the larger value
+    # in case one leg is bent and the other isn't, take the larger value
+    rdist1 = euclidean(0, 0, rheel1[0], rheel1[1])
+    ldist1 = euclidean(0, 0, lheel1[0], lheel1[1])
+    rdist2 = euclidean(0, 0, rheel2[0], rheel2[1])
+    ldist2 = euclidean(0, 0, lheel2[0], lheel2[1])
+    # pick the longer leg
+    height1 = rdist1
+    height2 = rdist2
+    if ldist1 > rdist1: 
+        height1 = ldist1
+    if ldist2 > rdist2:
+        height2 = ldist2
 
+    factor = height1 / height2
+    for key in person2:
+        coord = person2[key]
+        coordX = coord[0]
+        coordY = coord[1]
+
+        coordX = coordX * factor
+        coordY = coordY * factor
+        newPerson[key] = coordX, coordY 
+
+    # test to make sure height is now the same
+    testheel = newPerson['RHeel']
+    if height2 == ldist2 : 
+        testheel = newPerson['LHeel']
+    testdist = euclidean(0, 0, testheel[0], testheel[1])
+    if math.fabs(testdist - height1) > 0.01 :
+        print("Error in height adjustment", testdist, " ", height1)
+    return newPerson
+
+def euclidean(x1, y1, x2, y2):
+    distx = x1 - x2
+    disty = y1 - y2
+    distx = distx**2
+    disty = disty**2
+    dist = math.sqrt(distx + disty)
+    return dist
 
         
 if __name__ == "__main__":
@@ -87,4 +120,6 @@ if __name__ == "__main__":
     frames = savedFrames()
 
     score = comparePoseRecenterScale(frames, 50, 0)
+    print(score)
+    score = comparePoseRecenterScale(frames, 50, 1)
     print(score)
