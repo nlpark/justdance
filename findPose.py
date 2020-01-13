@@ -111,37 +111,39 @@ def buildFrame25(keypoints, i):
         raise ValueError("keypoint array is wrong length.... length = ", len(keypoints))
 
     print("Frame #", i)
-    frame = dict()
+    frame = []
 
     for i in range(1, 3):
-        frame['Nose-' + str(i)] = keypoints[i-1][0]
-        frame['Neck-'  + str(i)] = keypoints[i-1][1]
-        frame['RShoulder-' + str(i)] = keypoints[i-1][2]
-        frame['RElbow-' + str(i)] = keypoints[i-1][3]
-        frame['RWrist-' + str(i)] = keypoints[i-1][4]
-        frame['LShoulder-' + str(i)] = keypoints[i-1][5]
-        frame['LElbow-' + str(i)] = keypoints[i-1][6]
-        frame['LWrist-' + str(i)] = keypoints[i-1][7]
-        frame['MidHip-' + str(i)] = keypoints[i-1][8]
-        frame['RHip-' + str(i)] = keypoints[i-1][9]
-        frame['RKnee-' + str(i)] = keypoints[i-1][10]
-        frame['RAnkle-' + str(i)] = keypoints[i-1][11]
-        frame['LHip-' + str(i)] = keypoints[i-1][12]
-        frame['LKnee-' + str(i)] = keypoints[i-1][13]
-        frame['LAnkle-' + str(i)] = keypoints[i-1][14]
-        frame['REye-' + str(i)] = keypoints[i-1][15]
-        frame['LEye-' + str(i)] = keypoints[i-1][16]
-        frame['REar-' + str(i)] = keypoints[i-1][17]
-        frame['LEar-' + str(i)] = keypoints[i-1][18]
-        frame['LBigToe-' + str(i)] = keypoints[i-1][19]
-        frame['LSmallToe-' + str(i)] = keypoints[i-1][20]
-        frame['LHeel-' + str(i)] = keypoints[i-1][21]
-        frame['RBigToe-' + str(i)] = keypoints[i-1][22]
-        frame['RSmallToe-' + str(i)] = keypoints[i-1][23]
-        frame['RHeel-' + str(i)] = keypoints[i-1][24]
+        person = dict()
+        person['Nose-' + str(i)] = keypoints[i-1][0]
+        person['Neck-'  + str(i)] = keypoints[i-1][1]
+        person['RShoulder-' + str(i)] = keypoints[i-1][2]
+        person['RElbow-' + str(i)] = keypoints[i-1][3]
+        person['RWrist-' + str(i)] = keypoints[i-1][4]
+        person['LShoulder-' + str(i)] = keypoints[i-1][5]
+        person['LElbow-' + str(i)] = keypoints[i-1][6]
+        person['LWrist-' + str(i)] = keypoints[i-1][7]
+        person['MidHip-' + str(i)] = keypoints[i-1][8]
+        person['RHip-' + str(i)] = keypoints[i-1][9]
+        person['RKnee-' + str(i)] = keypoints[i-1][10]
+        person['RAnkle-' + str(i)] = keypoints[i-1][11]
+        person['LHip-' + str(i)] = keypoints[i-1][12]
+        person['LKnee-' + str(i)] = keypoints[i-1][13]
+        person['LAnkle-' + str(i)] = keypoints[i-1][14]
+        person['REye-' + str(i)] = keypoints[i-1][15]
+        person['LEye-' + str(i)] = keypoints[i-1][16]
+        person['REar-' + str(i)] = keypoints[i-1][17]
+        person['LEar-' + str(i)] = keypoints[i-1][18]
+        person['LBigToe-' + str(i)] = keypoints[i-1][19]
+        person['LSmallToe-' + str(i)] = keypoints[i-1][20]
+        person['LHeel-' + str(i)] = keypoints[i-1][21]
+        person['RBigToe-' + str(i)] = keypoints[i-1][22]
+        person['RSmallToe-' + str(i)] = keypoints[i-1][23]
+        person['RHeel-' + str(i)] = keypoints[i-1][24]
+        frame.append(person)
 
     # print(frame)
-    # print("------------------------------------------------------------------------------------------------")
+    print("------------------------------------------------------------------------------------------------")
 
     return frame
 
